@@ -411,10 +411,11 @@ func (m Message) GetMentions() []Mention {
 }
 
 func (api *VkAPI) GetRandomID() string {
+	rand.Seed(time.Now().UnixNano())
 	return strconv.FormatUint(uint64(rand.Uint32()), 10)
 }
 
-//SendAdvancedPeerMessage sending a message to chat
+// SendAdvancedPeerMessage sending a message to chat
 func (api *VkAPI) SendAdvancedPeerMessage(peerID int64, message Reply) (id int, err error) {
 	r := SimpleResponse{}
 	params := H{
@@ -435,7 +436,7 @@ func (api *VkAPI) SendAdvancedPeerMessage(peerID int64, message Reply) (id int, 
 	return r.Response, err
 }
 
-//SendPeerMessage sending a message to chat
+// SendPeerMessage sending a message to chat
 func (api *VkAPI) SendPeerMessage(peerID int64, msg string) (id int, err error) {
 	r := SimpleResponse{}
 	err = api.CallMethod(apiMessagesSend, H{
@@ -447,7 +448,7 @@ func (api *VkAPI) SendPeerMessage(peerID int64, msg string) (id int, err error) 
 	return r.Response, err
 }
 
-//SendChatMessage sending a message to chat
+// SendChatMessage sending a message to chat
 func (api *VkAPI) SendChatMessage(chatID int, msg string) (id int, err error) {
 	r := SimpleResponse{}
 	err = api.CallMethod(apiMessagesSend, H{
@@ -459,7 +460,7 @@ func (api *VkAPI) SendChatMessage(chatID int, msg string) (id int, err error) {
 	return r.Response, err
 }
 
-//SendMessage sending a message to user
+// SendMessage sending a message to user
 func (api *VkAPI) SendMessage(userID int, msg string) (id int, err error) {
 	r := SimpleResponse{}
 	if msg != "" {
