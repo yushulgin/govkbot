@@ -1,4 +1,4 @@
-module github.com/nikepan/govkbot/v2
+module github.com/nikepan/govkbot
 
 go 1.19
 
