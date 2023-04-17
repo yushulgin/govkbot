@@ -14,12 +14,13 @@ type Action struct {
 	Type    string `json:"type"`
 	Payload string `json:"payload"`
 	Label   string `json:"label"`
+	Link    string `json:"link,omitempty"`
 }
 
 // Button for keyboard, which sends to user
 type Button struct {
 	Action Action `json:"action"`
-	Color  string `json:"color"`
+	Color  string `json:"color,omitempty"`
 }
 
 // Keyboard to send for user
