@@ -8,6 +8,13 @@ import (
 	"time"
 )
 
+type MatchType int
+
+const (
+	MATCH_TYPE_HAS_PREFIX MatchType = 0
+	MATCH_TYPE_EQUALS     MatchType = 1
+)
+
 // VKBot - bot config
 type VKBot struct {
 	msgRoutes        map[string]msgRoute
@@ -27,6 +34,7 @@ type VKBot struct {
 type msgRoute struct {
 	SimpleHandler func(*Message) string
 	Handler       func(*Message) Reply
+	MatchType     MatchType
 }
 
 // NewBot - create new instance of bot
@@ -75,14 +83,14 @@ func (bot *VKBot) ListenGroup(api *VkAPI) error {
 
 // HandleMessage - add substr message handler.
 // Function must return string to reply or "" (if no reply)
-func (bot *VKBot) HandleMessage(command string, handler func(*Message) string) {
-	bot.msgRoutes[command] = msgRoute{SimpleHandler: handler}
+func (bot *VKBot) HandleMessage(command string, matchType MatchType, handler func(*Message) string) {
+	bot.msgRoutes[command] = msgRoute{SimpleHandler: handler, MatchType: matchType}
 }
 
 // HandleAdvancedMessage - add substr message handler.
 // Function must return string to reply or "" (if no reply)
-func (bot *VKBot) HandleAdvancedMessage(command string, handler func(*Message) Reply) {
-	bot.msgRoutes[command] = msgRoute{Handler: handler}
+func (bot *VKBot) HandleAdvancedMessage(command string, matchType MatchType, handler func(*Message) Reply) {
+	bot.msgRoutes[command] = msgRoute{Handler: handler, MatchType: matchType}
 }
 
 // HandleAction - add action handler.
@@ -142,7 +150,7 @@ func (bot *VKBot) GetMessages() ([]*Message, error) {
 	return allMessages, err
 }
 
-//RouteAction routes an action
+// RouteAction routes an action
 func (bot *VKBot) RouteAction(m *Message) (replies []string, err error) {
 	if m.Action != "" {
 		debugPrint("route action: %+v\n", m.Action)
@@ -172,19 +180,23 @@ func (bot *VKBot) RouteMessage(m *Message) (replies []Reply, err error) {
 		return replies, err
 	}
 	for k, v := range bot.msgRoutes {
-		if HasPrefix(message, k) {
-			if v.Handler != nil {
-				reply := v.Handler(m)
-				if reply.Msg != "" || reply.Keyboard != nil {
-					replies = append(replies, reply)
-				}
-			} else {
-				msg := v.SimpleHandler(m)
-				if msg != "" {
-					replies = append(replies, Reply{Msg: msg})
-				}
+		if v.MatchType == MATCH_TYPE_HAS_PREFIX && !HasPrefix(message, k) {
+			continue
+		} else if v.MatchType == MATCH_TYPE_EQUALS && !Equals(message, k) {
+			continue
+		}
 
+		if v.Handler != nil {
+			reply := v.Handler(m)
+			if reply.Msg != "" || reply.Keyboard != nil {
+				replies = append(replies, reply)
 			}
+		} else {
+			msg := v.SimpleHandler(m)
+			if msg != "" {
+				replies = append(replies, Reply{Msg: msg})
+			}
+
 		}
 	}
 	return replies, nil

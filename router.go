@@ -12,7 +12,7 @@ const (
 	longPollVersion = 3
 )
 
-//API - bot API
+// API - bot API
 var API = newAPI()
 
 var Bot = API.NewBot()
@@ -62,14 +62,14 @@ func SetLang(lang string) {
 
 // HandleMessage - add substr message handler.
 // Function must return string to reply or "" (if no reply)
-func HandleMessage(command string, handler func(*Message) string) {
-	Bot.HandleMessage(command, handler)
+func HandleMessage(command string, matchType MatchType, handler func(*Message) string) {
+	Bot.HandleMessage(command, matchType, handler)
 }
 
 // HandleAdvancedMessage - add substr message handler.
 // Function must return string to reply or "" (if no reply)
-func HandleAdvancedMessage(command string, handler func(*Message) Reply) {
-	Bot.HandleAdvancedMessage(command, handler)
+func HandleAdvancedMessage(command string, matchType MatchType, handler func(*Message) Reply) {
+	Bot.HandleAdvancedMessage(command, matchType, handler)
 }
 
 // HandleAction - add action handler.
