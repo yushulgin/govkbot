@@ -10,23 +10,26 @@ type Mention struct {
 	Name string
 }
 
+type Action struct {
+	Type    string `json:"type"`
+	Payload string `json:"payload"`
+	Label   string `json:"label"`
+}
+
 // Button for keyboard, which sends to user
 type Button struct {
-	Action struct {
-		Type    string `json:"type"`
-		Payload string `json:"payload"`
-		Label   string `json:"label"`
-	} `json:"action"`
-	Color string `json:"color"`
+	Action Action `json:"action"`
+	Color  string `json:"color"`
 }
 
 // Keyboard to send for user
 type Keyboard struct {
 	OneTime bool       `json:"one_time"`
 	Buttons [][]Button `json:"buttons"`
+	Inline  bool       `json:"inline"`
 }
 
-//Reply for message
+// Reply for message
 type Reply struct {
 	Msg      string
 	Keyboard *Keyboard
@@ -130,6 +133,10 @@ type UserProfile struct {
 	Country         Geo
 }
 
+type VKIsMeinssagesFromGroupAllowed struct {
+	IsAllowed int `json:"is_allowed"`
+}
+
 // GroupProfile - conversation group profile
 type GroupProfile struct {
 	ID       int
@@ -184,6 +191,12 @@ type SimpleResponse struct {
 	Error    *VKError
 }
 
+// UsersResponse - VK user response
+type IsMessagesFromGroupAllowedResponse struct {
+	Response VKIsMeinssagesFromGroupAllowed
+	Error    *VKError
+}
+
 // ErrorResponse - need to parse VK error
 type ErrorResponse struct {
 	Error *VKError
@@ -216,12 +229,12 @@ func (err ResponseError) Error() string {
 	return err.err.Error()
 }
 
-//Content - error content
+// Content - error content
 func (err ResponseError) Content() string {
 	return err.content
 }
 
-//ConversationInfo - conversation info
+// ConversationInfo - conversation info
 type ConversationInfo struct {
 	Peer struct {
 		ID      int
@@ -252,7 +265,7 @@ type ConversationInfo struct {
 	} `json:"chat_settings"`
 }
 
-//ConversationsResponse - resonse of confersations info
+// ConversationsResponse - resonse of confersations info
 type ConversationsResponse struct {
 	Response struct {
 		Items    []ConversationInfo

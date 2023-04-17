@@ -35,6 +35,7 @@ type VkAPI struct {
 const (
 	apiUsersGet                       = "users.get"
 	apiGroupsGet                      = "groups.getById"
+	apiIsMessagesFromGroupAllowed     = "messages.isMessagesFromGroupAllowed"
 	apiMessagesGet                    = "messages.get"
 	apiMessagesGetChat                = "messages.getChat"
 	apiMessagesGetConversationsById   = "messages.getConversationsById"
@@ -242,6 +243,41 @@ func (api *VkAPI) GetUserChatUsers(chatID int) (users []*User, err error) {
 	}, &r)
 
 	return r.Response, err
+}
+
+// SendPeerMessage sending a message to chat
+func (api *VkAPI) IsMessagesFromGroupAllowed(group_id int64, user_id int64) (isAllowed VKIsMeinssagesFromGroupAllowed, err error) {
+	r := IsMessagesFromGroupAllowedResponse{}
+	err = api.CallMethod(apiIsMessagesFromGroupAllowed, H{
+		"group_id":  strconv.FormatInt(group_id, 10),
+		"user_id":   strconv.FormatInt(user_id, 10),
+		"random_id": api.GetRandomID(),
+	}, &r)
+	return r.Response, err
+}
+
+func IsAllowedMessages(user_id int64) (bool, error) {
+	var err error
+	var isAllow VKIsMeinssagesFromGroupAllowed
+	if API.GroupID == 0 {
+		g, err := API.CurrentGroup()
+		if err != nil || g.ID == 0 {
+			fmt.Printf("Get current group error %+v\n", err)
+			return false, err
+		} else {
+			API.GroupID = g.ID
+		}
+	}
+	if API.GroupID != 0 {
+		isAllow, err = API.IsMessagesFromGroupAllowed(int64(API.GroupID), user_id)
+		if err != nil {
+			return false, err
+		}
+	}
+	if isAllow.IsAllowed == 1 {
+		return true, nil
+	}
+	return false, nil
 }
 
 // GetChatUsers - get chat users
