@@ -149,9 +149,9 @@ func (api *VkAPI) Me() (*User, error) {
 }
 
 // CurrentGroup - get current group info
-func (api *VkAPI) CurrentGroup() (*User, error) {
+func (api *VkAPI) CurrentGroup() (*Group, error) {
 
-	r := UsersResponse{}
+	r := GroupResponse{}
 	err := api.CallMethod(apiGroupsGet, H{"fields": "screen_name"}, &r)
 
 	if len(r.Response) > 0 {
